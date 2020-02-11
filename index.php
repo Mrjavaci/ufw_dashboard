@@ -22,20 +22,53 @@
                     echo $ufw->reason;
                     $none = "none";
                 }
+                $ufwStatus = $ufw->getUfwStatus()
+
 
                 ?>
             </div>
             <div class="col-md-3"></div>
         </div>
 
-        <div class="row" style="display:<?=$none?>;">
+        <div class="row" style="display:<?= $none ?>;">
             <div class="col-md-3"></div>
-            <div class="col-md-6"><div class="text-center"><h2>Geçerli Kurallar</h2></div></div>
+            <div class="col-md-6">
+                <div class="text-center"><h2>Geçerli Kurallar</h2></div>
+            </div>
             <div class="col-md-3"></div>
         </div>
-        <div class="row" style="display:<?=$none?>;">
-            <div class="col-md-6"></div>
-            <div class="col-md-6"></div>
+        <div class="row" style="display:<?= $none ?>;">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <div class="table-responsive bg-light">
+                    <table class="table table-striped" >
+                        <thead>
+                        <tr>
+                            <th scope="col">To</th>
+                            <th scope="col">Action</th>
+                            <th scope="col">From</th>
+                            <th scope="col">Açıklama</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                        foreach ($ufwStatus as $status) {
+                            ?>
+                            <tr>
+                                <th><?= $status["to"] ?></th>
+                                <th><?= $status["action"] ?></th>
+                                <th><?= $status["from"] ?></th>
+                                <th><?= $ufw->getAciklama($status)?></th>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="col-md-1"></div>
         </div>
     </div>
 </div>

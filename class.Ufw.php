@@ -40,6 +40,57 @@ class Ufw
         }
     }
 
+    /**
+     * @return array
+     *
+     */
+    public function getUfwStatus()
+    {
+        $statusList = preg_split('/\r\n|\r|\n/', shell_exec("sudo ufw status"));
+        return $this->normalizeArray($this->removeSpaces($statusList));
+    }
+
+
+    private function removeSpaces(array $statusList)
+    {
+        unset($statusList[0]);
+        unset($statusList[1]);
+        unset($statusList[2]);
+        unset($statusList[3]);
+        $arr = array();
+        foreach ($statusList as $item) {
+            $item2 = str_replace(' ', '', $item);
+            if ($item2[0] != "" || isset($item2[0])) {
+
+                array_push($arr, $item2);
+            }
+        }
+
+        return $arr;
+    }
+
+    private function normalizeArray(array $removeSpaces)
+    {
+        $arr = array();
+        foreach ($removeSpaces as $sonuc) {
+            $inArray = array();
+            if (strpos($sonuc, 'ALLOW') !== false || strpos($sonuc, 'allow') !== false) {
+                $sonucArr = explode("ALLOW", $sonuc);
+                $inArray["to"] = $sonucArr[0];
+                $inArray["action"] = "ALLOW";
+                $inArray["from"] = $sonucArr[1];
+
+            } else if (strpos($sonuc, 'DENY') !== false || strpos($sonuc, 'deny') !== false) {
+                $sonucArr = explode("DENY", $sonuc);
+                $inArray["to"] = $sonucArr[0];
+                $inArray["action"] = "DENY";
+                $inArray["from"] = $sonucArr[1];
+            }
+            array_push($arr, $inArray);
+        }
+        return $arr;
+    }
+
     private function checkIsRoot()
     {
         if (empty(shell_exec("sudo php -v"))) {
@@ -58,6 +109,27 @@ class Ufw
     public function isEnable()
     {
         return $this->isEnable;
+    }
+
+    public function getAciklama(array $status)
+    {
+        $to = $status["to"];
+        $action = $status["action"];
+        $from = $status["from"];
+        if ($action == "ALLOW" || $action == "allow"){
+            if ($from == "Anywhere") {
+            return $to ." Portuna her ip adresinden ulaşılabilsin.";
+            }else{
+            return $to . " Portuna sadece " .$from. " İp adresinden ulaşılabilsin";
+            }
+
+        }else{
+            if ($from == "Anywhere") {
+                return $to ." Portuna hiçbir ip adresinden ulaşılamasın.";
+            }else{
+                return $to . " Portuna sadece " .$from. " İp adresinden ulaşılamasın.";
+            }
+        }
     }
 
 
