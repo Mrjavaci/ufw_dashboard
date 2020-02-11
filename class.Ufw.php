@@ -8,7 +8,6 @@
 
 class Ufw
 {
-    private $status = false;
     private $isEnable = false;
     public $reason = "";
 
@@ -46,7 +45,7 @@ class Ufw
      */
     public function getUfwStatus()
     {
-        $statusList = preg_split('/\r\n|\r|\n/', shell_exec("sudo ufw status"));
+        $statusList = preg_split('/\r\n|\r|\n/', shell_exec("sudo ufw status numbered"));
         return $this->normalizeArray($this->removeSpaces($statusList));
     }
 
@@ -74,17 +73,33 @@ class Ufw
         $arr = array();
         foreach ($removeSpaces as $sonuc) {
             $inArray = array();
-            if (strpos($sonuc, 'ALLOW') !== false || strpos($sonuc, 'allow') !== false) {
-                $sonucArr = explode("ALLOW", $sonuc);
-                $inArray["to"] = $sonucArr[0];
+            if (strpos($sonuc, 'ALLOWIN') !== false || strpos($sonuc, 'allowin') !== false) {
+                $sonucArr = explode("ALLOWIN", $sonuc);
+                $re = '/\[(.*?)\]/m';
+                preg_match_all($re, $sonucArr[0], $matches, PREG_SET_ORDER, 0);
+                $inArray["id"] = $matches[0][1];
+                if (intval($matches[0][1]) >= 10) {
+                    $inArray["to"] = substr($sonucArr[0], 4);
+                } else {
+                    $inArray["to"] = substr($sonucArr[0], 3);
+                }
                 $inArray["action"] = "ALLOW";
                 $inArray["from"] = $sonucArr[1];
 
-            } else if (strpos($sonuc, 'DENY') !== false || strpos($sonuc, 'deny') !== false) {
-                $sonucArr = explode("DENY", $sonuc);
-                $inArray["to"] = $sonucArr[0];
+            } else if (strpos($sonuc, 'DENYIN') !== false || strpos($sonuc, 'denyin') !== false) {
+                $sonucArr = explode("DENYIN", $sonuc);
+                $re = '/\[(.*?)\]/m';
+                preg_match_all($re, $sonucArr[0], $matches, PREG_SET_ORDER, 0);
+                $inArray["id"] = $matches[0][1];
+                if (intval($matches[0][1]) >= 10) {
+                    $inArray["to"] = substr($sonucArr[0], 4);
+                } else {
+                    $inArray["to"] = substr($sonucArr[0], 3);
+                }
                 $inArray["action"] = "DENY";
                 $inArray["from"] = $sonucArr[1];
+            } else {
+                echo "Read Error";
             }
             array_push($arr, $inArray);
         }
@@ -116,18 +131,18 @@ class Ufw
         $to = $status["to"];
         $action = $status["action"];
         $from = $status["from"];
-        if ($action == "ALLOW" || $action == "allow"){
+        if ($action == "ALLOW" || $action == "allow") {
             if ($from == "Anywhere") {
-            return $to ." Portuna her ip adresinden ulaşılabilsin.";
-            }else{
-            return $to . " Portuna sadece " .$from. " İp adresinden ulaşılabilsin";
+                return $to . " Portuna her ip adresinden ulaşılabilsin.";
+            } else {
+                return $to . " Portuna sadece " . $from . " İp adresinden ulaşılabilsin";
             }
 
-        }else{
+        } else {
             if ($from == "Anywhere") {
-                return $to ." Portuna hiçbir ip adresinden ulaşılamasın.";
-            }else{
-                return $to . " Portuna sadece " .$from. " İp adresinden ulaşılamasın.";
+                return $to . " Portuna hiçbir ip adresinden ulaşılamasın.";
+            } else {
+                return $to . " Portuna sadece " . $from . " İp adresinden ulaşılamasın.";
             }
         }
     }

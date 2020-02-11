@@ -11,20 +11,16 @@
             <div class="col-md-6">
 
                 <?php
-
-
                 require_once "class.Ufw.php";
-
-
                 $ufw = new Ufw();
                 $none = "";
-                if (!$ufw->isEnable()) {
+                if (!$ufw->isEnable()) { //hata durumlarında false dönüyor,
+                    // (shell_exec izni olmaması,www kullanıcısının yetksizi olması vs tüm hata durumlarında açıklama reason değişkenine gidiyor)
                     echo $ufw->reason;
                     $none = "none";
                 }
-                $ufwStatus = $ufw->getUfwStatus()
 
-
+                $ufwStatus = $ufw->getUfwStatus();
                 ?>
             </div>
             <div class="col-md-3"></div>
@@ -41,13 +37,16 @@
             <div class="col-md-1"></div>
             <div class="col-md-10">
                 <div class="table-responsive bg-light">
-                    <table class="table table-striped" >
+                    <table class="table table-striped">
                         <thead>
                         <tr>
+                            <th scope="col">id</th>
                             <th scope="col">To</th>
                             <th scope="col">Action</th>
                             <th scope="col">From</th>
                             <th scope="col">Açıklama</th>
+                            <th scope="col">sil</th>
+
                         </tr>
                         </thead>
                         <tbody>
@@ -55,10 +54,14 @@
                         foreach ($ufwStatus as $status) {
                             ?>
                             <tr>
+                                <th><?= $status["id"] ?></th>
                                 <th><?= $status["to"] ?></th>
                                 <th><?= $status["action"] ?></th>
                                 <th><?= $status["from"] ?></th>
-                                <th><?= $ufw->getAciklama($status)?></th>
+                                <th><?= $ufw->getAciklama($status) ?></th>
+                                <th>
+                                    <button class="btn-danger rounded" onclick="sil('<?= $status["id"] ?>')">SİL</button>
+                                </th>
                             </tr>
                             <?php
                         }
@@ -74,6 +77,13 @@
 </div>
 
 </body>
+<script>
+    function sil(id) {
+        $.post("islem.php", {"id": id,"islem":"delete"}, function(result){
+           console.log(result);
+        });
+    }
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </html>
