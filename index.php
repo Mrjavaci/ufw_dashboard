@@ -46,7 +46,17 @@
         <div class="row" style="display:<?= $none ?>;">
             <div class="col-md-3"></div>
             <div class="col-md-6">
-                <div class="text-center"><h2>Geçerli Kurallar</h2></div>
+                <div class="text-center"><h2>
+                        <?php
+                        $silText = "Sil";
+                        if ($_GET["dil"] == "tr"){
+                            echo "Geçerli Kurallar";
+                        }else {
+                            $silText = "Delete";
+                            echo "Active Rules";
+                        }
+                    ?>
+                    </h2></div>
             </div>
             <div class="col-md-3"></div>
         </div>
@@ -62,7 +72,7 @@
                             <th scope="col">Action</th>
                             <th scope="col">From</th>
                             <th scope="col">Açıklama</th>
-                            <th scope="col">sil</th>
+                            <th scope="col"><?=$silText?></th>
 
                         </tr>
                         </thead>
@@ -77,7 +87,7 @@
                                 <th><?= $status["from"] ?></th>
                                 <th><?= $ufw->getAciklama($status) ?></th>
                                 <th>
-                                    <button class="btn-danger rounded" onclick="sil('<?= $status["id"] ?>')">SİL</button>
+                                    <button class="btn-danger rounded" onclick="sil('<?= $status["id"] ?>')"><?=$silText?></button>
                                 </th>
                             </tr>
                             <?php
@@ -103,8 +113,9 @@
             console.log(result);
         });
     }
+
     $(document).ready(function () {
-        $( ".selector" ).change(function() {
+        $(".selector").change(function () {
             $(".form").submit();
 
         });

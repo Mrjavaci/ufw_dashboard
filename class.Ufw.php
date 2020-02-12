@@ -169,5 +169,10 @@ class Ufw
         $this->dil = $dil;
     }
 
+    public function getDil()
+    {
+        return $this->dil;
+    }
+
 
 }
