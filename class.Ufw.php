@@ -10,6 +10,7 @@ class Ufw
 {
     private $isEnable = false;
     public $reason = "";
+    private $dil = "tr";
 
     public function __construct()
     {
@@ -133,18 +134,39 @@ class Ufw
         $from = $status["from"];
         if ($action == "ALLOW" || $action == "allow") {
             if ($from == "Anywhere") {
-                return $to . " Portuna her ip adresinden ulaşılabilsin.";
+                if ($this->dil == "tr") {
+                    return $to . " Portuna her ip adresinden ulaşılabilsin.";
+                } else {
+                    return "Access to " . $to . " Port From Every Ip Addresses.";
+                }
             } else {
-                return $to . " Portuna sadece " . $from . " İp adresinden ulaşılabilsin";
+                if ($this->dil == "tr") {
+                    return $to . " Portuna sadece " . $from . " İp adresinden ulaşılabilsin";
+                } else {
+                    return "Access to " . $to . " Port Only from " . $from . " Ip address";
+                }
             }
 
         } else {
             if ($from == "Anywhere") {
-                return $to . " Portuna hiçbir ip adresinden ulaşılamasın.";
+                if ($this->dil == "tr") {
+                    return $to . " Portuna hiçbir ip adresinden ulaşılamasın.";
+                } else {
+                    return $to . " Port connot be access from any ip addres.";
+                }
             } else {
-                return $to . " Portuna sadece " . $from . " İp adresinden ulaşılamasın.";
+                if ($this->dil == "tr") {
+                    return $to . " Portuna sadece " . $from . " İp adresinden ulaşılamasın.";
+                } else {
+                    return $to . " Port can not be reached only from " . $from . " ip address";
+                }
             }
         }
+    }
+
+    public function setDil($dil)
+    {
+        $this->dil = $dil;
     }
 
 
