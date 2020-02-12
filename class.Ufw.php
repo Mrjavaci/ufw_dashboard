@@ -12,13 +12,19 @@ class Ufw
     public $reason = "";
     private $dil = "tr";
 
-    public function __construct()
+    public function __construct($dil)
     {
+        $this->dil = $dil;
         if ($this->isEnabled('shell_exec')) {
             $this->isEnable = $this->checkIsRoot();
         } else {
             $this->isEnable = false;
-            $this->reason = "shell_exec fonksiyonuna izin verilmiyor. Lütfen php.ini dosyanızı düzenleyin.<br>";
+            if ($this->dil == "tr") {
+                $this->reason = "shell_exec fonksiyonuna izin verilmiyor. Lütfen php.ini dosyanızı düzenleyin.<br>";
+            }else{
+                $this->reason = "php shell_exec function is not allowed. Please edit your php.ini file.<br>";
+
+            }
         }
     }
 
@@ -33,7 +39,11 @@ class Ufw
         $re = '/Status: (.*)/m';
         preg_match_all($re, $str, $matches, PREG_SET_ORDER, 0);
         if ($matches[0][1] != "active") {
-            $this->reason .= "UFW servisi enable durumda değil. Lütfen UFW servisini aktif edip tekrar deneyiniz. <br>";
+            if ($this->dil == "tr") {
+                $this->reason .= "UFW servisi enable durumda değil. Lütfen UFW servisini aktif edip tekrar deneyiniz. <br>";
+            } else {
+                $this->reason .= "UFW service is not active. Please activate UFW service and try again. <br>";
+            }
             return false;
         } else {
             return true;
@@ -110,9 +120,15 @@ class Ufw
     private function checkIsRoot()
     {
         if (empty(shell_exec("sudo php -v"))) {
-            $this->reason .= shell_exec("whoami") . " Kullanıcısına root yetkileri (ufw servisi kontrolü için) verilmemiş.<br>";
-            $this->reason .= "Lütfen SSH ile bağlanıp \"sudo visodu\" komutu ile sudo config dosyasını açıp aşağıdaki kodu ekleyin. <br>";
-            $this->reason .= shell_exec("whoami") . " ALL=NOPASSWD: ALL<br>";
+            if ($this->dil == "tr") {
+                $this->reason .= shell_exec("whoami") . " Kullanıcısına root yetkileri (ufw servisi kontrolü için) verilmemiş.<br>";
+                $this->reason .= "Lütfen SSH ile bağlanıp \"sudo visudo\" komutu ile sudo config dosyasını açıp aşağıdaki kodu ekleyin. <br>";
+                $this->reason .= shell_exec("whoami") . " ALL=NOPASSWD: ALL<br>";
+            } else {
+                $this->reason .= " The root user (for ufw service control) is not given to " . shell_exec("whoami") . " user.<br>";
+                $this->reason .= "Please connect with SSH and open the sudo config file with \"sudo visudo\" command and add the following code. <br>";
+                $this->reason .= shell_exec("whoami") . " ALL=NOPASSWD: ALL<br>";
+            }
             return false;
         } else {
             return $this->checkIfUfwEnabled();

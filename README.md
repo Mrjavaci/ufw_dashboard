@@ -15,3 +15,15 @@ Ekran Görüntüleri
 
 
 ![Türkçe](screen_shots/tr.png)
+#hata durumları
+Servis Aktif olmadığı durumda
+![Türkçe](screen_shots/not_active_en.png)
+
+
+![Türkçe](screen_shots/not_active_tr.png)
+
+WWW kullanıcısına root yetkisi verilmediğinde
+![Türkçe](screen_shots/root_problem_en.png)
+
+
+![Türkçe](screen_shots/root_problem_tr.png)

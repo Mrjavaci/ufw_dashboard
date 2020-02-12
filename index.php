@@ -11,11 +11,18 @@
             <div class="col-md-6">
 
                 <?php
-                require_once "class.Ufw.php";
-                $ufw = new Ufw();
-                $none = "";
                 if (isset($_GET["dil"]) && !empty($_GET["dil"])) {
-                    $ufw->setDil($_GET["dil"]);
+                    require_once "class.Ufw.php";
+                    $ufw = new Ufw($_GET["dil"]);
+                    $none = "";
+
+                    if (!$ufw->isEnable()) { //hata durumlarında false dönüyor,
+                        // (shell_exec izni olmaması,www kullanıcısının yetksizi olması vs tüm hata durumlarında açıklama reason değişkenine gidiyor)
+                        echo $ufw->reason;
+                        $none = "none";
+                    }
+
+                    $ufwStatus = $ufw->getUfwStatus();
                 } else {
                     ?>
                     <div class="text-center">
@@ -31,13 +38,8 @@
                     </div>
                     <?php
                 }
-                if (!$ufw->isEnable()) { //hata durumlarında false dönüyor,
-                    // (shell_exec izni olmaması,www kullanıcısının yetksizi olması vs tüm hata durumlarında açıklama reason değişkenine gidiyor)
-                    echo $ufw->reason;
-                    $none = "none";
-                }
 
-                $ufwStatus = $ufw->getUfwStatus();
+
                 ?>
             </div>
             <div class="col-md-3"></div>
@@ -49,13 +51,13 @@
                 <div class="text-center"><h2>
                         <?php
                         $silText = "Sil";
-                        if ($_GET["dil"] == "tr"){
+                        if ($_GET["dil"] == "tr") {
                             echo "Geçerli Kurallar";
-                        }else {
+                        } else {
                             $silText = "Delete";
                             echo "Active Rules";
                         }
-                    ?>
+                        ?>
                     </h2></div>
             </div>
             <div class="col-md-3"></div>
@@ -72,7 +74,7 @@
                             <th scope="col">Action</th>
                             <th scope="col">From</th>
                             <th scope="col">Açıklama</th>
-                            <th scope="col"><?=$silText?></th>
+                            <th scope="col"><?= $silText ?></th>
 
                         </tr>
                         </thead>
@@ -87,7 +89,7 @@
                                 <th><?= $status["from"] ?></th>
                                 <th><?= $ufw->getAciklama($status) ?></th>
                                 <th>
-                                    <button class="btn-danger rounded" onclick="sil('<?= $status["id"] ?>')"><?=$silText?></button>
+                                    <button class="btn-danger rounded" onclick="sil('<?= $status["id"] ?>')"><?= $silText ?></button>
                                 </th>
                             </tr>
                             <?php
